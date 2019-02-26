@@ -1,29 +1,30 @@
 defmodule Prime do
   def get_primes(nums) do
-    center = Enum.reduce_while(nums, {0, nums |> hd |> abs},
+    first_num = nums |> hd |> abs
+
+    index_of_first_positive = Enum.reduce_while(nums, {0, first_num},
       fn x, {index, last} ->
         if abs(x) > last, do: {:halt, index}, else: {:cont, {index + 1, abs(x)}}
       end)
 
-    {left, right} = Enum.split(nums, center)
-
-    get_primes(left, Enum.reverse(right), [])
+    {negatives, positives} = Enum.split(nums, index_of_first_positive)
+    get_primes(negatives, Enum.reverse(positives), [])
   end
 
-  def get_primes([l_h|l_t], [r_h|_] = right, acc) when abs(l_h) >= abs(r_h) do
-    get_primes(l_t, right, [l_h * l_h|acc])
+  def get_primes([neg_h|neg_t], [pos_h|_] = pos, acc) when abs(neg_h) >= abs(pos_h) do
+    get_primes(neg_t, pos, [neg_h * neg_h|acc])
   end
 
-  def get_primes(left, [r_h|r_t], acc) do
-    get_primes(left, r_t, [r_h * r_h|acc])
+  def get_primes(neg, [h|t], acc) do
+    get_primes(neg, t, [h * h|acc])
   end
 
-  def get_primes([], [r_h|r_t], acc) do
-    get_primes([], r_t, [r_h * r_h|acc])
+  def get_primes([], [h|t], acc) do
+    get_primes([], t, [h * h|acc])
   end
 
-  def get_primes([l_h|l_t], [], acc) do
-    get_primes(l_t, [], [l_h * l_h|acc])
+  def get_primes([h|t], [], acc) do
+    get_primes(t, [], [h * h|acc])
   end
 
   def get_primes([], [], acc) do
